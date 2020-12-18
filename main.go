@@ -17,11 +17,13 @@ const xattrKey = "user.com.ath0.tm.date"
 
 const whitespace = "\t\n\x00 "
 
-var verbose = false
-var dryrun = false
+var (
+	verbose = false
+	dryrun  = false
+)
 
 func getcrtime(fname string) (time.Time, error) {
-	xdt, err := xattr.Getxattr(fname, xattrKey)
+	xdt, err := xattr.Get(fname, xattrKey)
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no data available") {
 			return time.Time{}, nil
@@ -40,7 +42,7 @@ func getcrtime(fname string) (time.Time, error) {
 
 func setcrtime(fname string, timestamp time.Time) error {
 	dts := timestamp.Format(time.RFC3339)
-	err := xattr.Setxattr(fname, xattrKey, []byte(dts))
+	err := xattr.Set(fname, xattrKey, []byte(dts))
 	return err
 }
 
@@ -129,7 +131,6 @@ func processDir(fname string, dur time.Duration, override time.Time, depth int) 
 }
 
 func main() {
-
 	pdur := flag.String("days", "14", "days to keep files for before deleting")
 	flag.BoolVar(&verbose, "verbose", false, "display verbose messages")
 	flag.BoolVar(&dryrun, "dryrun", false, "don't actually delete anything")
@@ -147,5 +148,4 @@ func main() {
 			fmt.Fprintf(os.Stderr, "error: %s", err)
 		}
 	}
-
 }
